@@ -43,6 +43,7 @@ All intelligence is handled in-browser via Chrome’s extension APIs.
 ```bash
 git clone https://github.com/ajinkya8010/auto-tab-grouper.git
 cd auto-tab-grouper
+```
 
 ## 🔧 2. Load the Extension
 
