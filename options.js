@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
       // Save the API key
       chrome.storage.local.set({ mistralApiKey: key }, () => {
-        status.textContent = 'API key saved successfully!';
+        status.textContent = 'API key saved successfully! You can now click the extension icon and start grouping tabs';
         status.style.color = 'green';
   
         // Clear the status message after 3 seconds
