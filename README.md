@@ -32,7 +32,9 @@ All intelligence is handled in-browser via Chrome’s extension APIs.
 
 ## 📸 Demo
 
-![Tab Grouper demo](./assets/tab-grouper.webm)
+<video src="./assets/tab-grouper.webm" autoplay loop muted playsinline width="800">
+  Your browser does not support the video tag.
+</video>
 
 ---
 
