@@ -1,6 +1,6 @@
 # 🔖 Tab Grouper – Smart Tab Organizer using LLM
 
-Tab Grouper is a Chrome extension that intelligently organizes your open tabs into semantic groups using a Language Model (LLM). With a single click, it classifies your tabs into meaningful categories like “AI Tools”, “News”, “Docs”, “Entertainment”, and more — all based on tab titles, URLs, and embedded page metadata like keywords and descriptions.
+Tab Grouper is a Chrome extension that intelligently organizes your open tabs into semantic groups using a Language Model (LLM). With a single click, it classifies your tabs into meaningful categories like “AI Tools”, “News”, “Docs”, “Entertainment”, and more — all based on tab titles, URLs, and embedded page metadata like keywords and descriptions. Note that it can also be used with brave browser but with some limitations
 
 > Powered by the Mistral API. No server required — just your API key.
 
@@ -32,7 +32,7 @@ All intelligence is handled in-browser via Chrome’s extension APIs.
 
 ## 📸 Demo
 
-> Add a GIF or screenshot here showing tabs being grouped after clicking the extension.
+![Tab Grouper demo](./assets/tab-grouper.webm)
 
 ---
 
@@ -90,22 +90,11 @@ cd auto-tab-grouper
 
 ---
 
-## 📁 Project Structure
-
-📦 tab-grouper/
-├── popup.html ← UI shown when extension icon is clicked
-├── popup.js ← Handles DOM + tab extraction + LLM messaging
-├── options.html ← Page to configure API key
-├── options.js ← Saves/retrieves API key using chrome.storage
-├── background.js ← Calls LLM, handles tab group creation
-├── manifest.json ← Chrome extension config
-
 ## 🧠 LLM Prompt Strategy
 
 - Tabs are grouped by semantic similarity, not just keywords.
 - Built-in prompt ensures group reuse (≥80% similarity), avoids overfitting.
 - Uses few-shot logic to improve grouping accuracy.
-- Examples: GitHub AI repo ≠ ChatGPT → handled with nuance.
 
 ---
 
@@ -118,7 +107,7 @@ cd auto-tab-grouper
 - ✅ Fast + efficient with caching
 - ✅ No external server required
 
-
+---
 
 ## 🙌 Credits
 
