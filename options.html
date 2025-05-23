@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>API Key Settings - Tab Grouper</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; max-width: 600px; }
+    label { display: block; margin-bottom: 8px; font-weight: bold; }
+    input[type="text"] { width: 100%; padding: 8px; font-size: 16px; }
+    button { margin-top: 10px; padding: 8px 16px; font-size: 16px; }
+    .status { margin-top: 10px; font-style: italic; }
+    .instructions { margin-top: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 4px; }
+    a { color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Mistral API Key Settings</h1>
+
+  <label for="apiKey">Enter your Mistral API Key:</label>
+  <input type="text" id="apiKey" placeholder="Paste your API key here" autocomplete="off" />
+  <button id="saveBtn">Save</button>
+  <div class="status" id="status"></div>
+
+  <div class="instructions">
+    <h2>How to get your Mistral API Key</h2>
+    <ol>
+      <li>Go to <a href="https://mistral.ai" target="_blank" rel="noopener">https://mistral.ai</a> and create an account or log in.</li>
+      <li>Navigate to your <strong>API keys</strong> section in your account dashboard.</li>
+      <li>Generate a new API key or copy an existing one.</li>
+      <li>Come back here and paste your key in the field above, then click <strong>Save</strong>.</li>
+    </ol>
+  </div>
+</body>
+<script src="options.js"></script>
+</html>

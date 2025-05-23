@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Tab Grouper",
+    "version": "1.0",
+    "description": "Intelligently groups browser tabs based on their content using an LLM",
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    },
+    "permissions": [
+      "tabs",
+      "tabGroups",
+      "storage",
+      "scripting"
+    ],
+    "host_permissions": [
+      "https://api.mistral.ai/*",
+       "<all_urls>"
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js",
+      "type": "module"
+    }
+  }
