@@ -170,13 +170,16 @@ async function setupTabGroups(groupAssignments) {
       groupMap[group.title] = group.id;
     }
   }
-  
+
+  let i=0;
+  const colors = ["grey", "blue", "red", "yellow", "green", "pink", "purple", "cyan"];
   // Create new groups for any that don't exist yet
   for (const groupName of uniqueGroups) {
     if (!groupMap[groupName]) {
       // Choose a random color for the new group
       const colors = ["grey", "blue", "red", "yellow", "green", "pink", "purple", "cyan"];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      // const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
       
       // Create a new group with a single tab (we'll add the actual tabs later)
       // Find a tab that will be in this group
@@ -188,10 +191,12 @@ async function setupTabGroups(groupAssignments) {
         
         await chrome.tabGroups.update(groupId, {
           title: groupName,
-          color: randomColor
+          color: colors[i % colors.length] 
+          
         });
         
         groupMap[groupName] = groupId;
+        i++;
       }
     }
   }
