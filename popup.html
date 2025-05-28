@@ -4,9 +4,13 @@
   <title>Tab Grouper</title>
   <style>
     body {
-      width: 250px;
-      padding: 15px;
+      width: 280px;
+      padding: 20px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+    }
+    #mainUI {
+      display: block;
     }
     .container {
       display: flex;
@@ -15,38 +19,91 @@
     }
     h1 {
       font-size: 18px;
-      margin-bottom: 15px;
+      margin: 0 0 20px 0;
       color: #333;
+      text-align: center;
+    }
+    .button-section {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     button {
+      width: 100%;
       padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .btn-primary {
       background-color: #4285f4;
       color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.3s;
     }
-    button:hover {
+    .btn-primary:hover:not(:disabled) {
       background-color: #3367d6;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background-color: #34a853;
+      color: white;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #2d8e47;
+      transform: translateY(-1px);
+    }
+    .btn-danger {
+      background-color: #ea4335;
+      color: white;
+    }
+    .btn-danger:hover:not(:disabled) {
+      background-color: #d33b2c;
+      transform: translateY(-1px);
     }
     button:disabled {
       background-color: #cccccc;
       cursor: not-allowed;
+      transform: none;
+    }
+    .button-description {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+      line-height: 1.3;
     }
     #status {
       margin-top: 15px;
-      font-size: 14px;
+      font-size: 13px;
       color: #555;
-      height: 20px;
+      text-align: center;
+      line-height: 1.4;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .spinner {
       display: none;
-      margin-top: 15px;
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 24px;
-      height: 24px;
+      margin: 10px auto;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       border-left-color: #4285f4;
       animation: spin 1s linear infinite;
@@ -55,15 +112,54 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .divider {
+      width: 100%;
+      height: 1px;
+      background-color: #e8eaed;
+      margin: 15px 0;
+    }
+    .status-success {
+      color: #34a853;
+    }
+    .status-error {
+      color: #ea4335;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div id="mainUI" class="container">
     <h1>Tab Grouper</h1>
-    <button id="groupTabs">Group Tabs</button>
+    
+    <div class="button-section">
+      <div class="section-title">Smart Grouping</div>
+      <div class="button-group">
+        <div>
+          <button id="aggressiveGroup" class="btn-primary">Aggressive Grouping</button>
+          <div class="button-description">Every tab gets grouped, even solo ones</div>
+        </div>
+        <div>
+          <button id="passiveGroup" class="btn-secondary">Passive Grouping</button>
+          <div class="button-description">Only clearly related tabs are grouped</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="button-section">
+      <div class="section-title">Group Management</div>
+      <div class="button-group">
+        <div>
+          <button id="deleteAllGroups" class="btn-danger">Delete All Groups</button>
+          <div class="button-description">Ungroup all tabs and remove groups</div>
+        </div>
+      </div>
+    </div>
+
     <div class="spinner" id="spinner"></div>
     <div id="status"></div>
   </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

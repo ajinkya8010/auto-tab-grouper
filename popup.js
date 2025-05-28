@@ -1,45 +1,48 @@
 /*
- * Popup Script - Tab Grouping Assistant Extension
+ * Enhanced Popup Script - Tab Grouping Assistant Extension
  *
  * Description:
- * This script runs in the popup of a Chrome extension. It allows the user to
- * automatically group open tabs in the current window based on their content
- * (title,URL, keywords and description), with the help of an LLM (Language Model) via the background script.
+ * This script runs in the popup of a Chrome extension. It provides multiple grouping modes:
+ * - Aggressive: Every tab gets grouped, even solo ones 
+ * - Passive: Only clearly related tabs are grouped, others stay free
+ * - Delete All Groups: Removes all tab groups and ungroups tabs
  *
  * Main Flow:
- * - Waits for the DOM to load and attaches a click listener to the "Group Tabs" button.
- * - On click:
- *    1. Disables the button and shows a loading spinner.
- *    2. Retrieves all tabs in the current Chrome window.
- *    3. Retrieves any existing tab groups to avoid duplication or reuse group names.
- *    4. Extracts necessary info from each tab (id, title, and URL).
- *    5. Sends tab data to the background script to process via an LLM.
- *    6. Receives grouping instructions from the background script and shows status to the user.
- *    7. Re-enables the button and hides the spinner.
+ * - Waits for the DOM to load and attaches listeners to all buttons
+ * - On grouping button click:
+ *    1. Disables all buttons and shows loading spinner
+ *    2. Retrieves all tabs in the current Chrome window
+ *    3. Retrieves any existing tab groups to avoid duplication or reuse group names
+ *    4. Extracts necessary info from each tab (id, title, URL, keywords, description)
+ *    5. Sends tab data with grouping mode to the background script
+ *    6. Receives grouping results and shows status to the user
+ *    7. Re-enables buttons and hides spinner
  *
- * Assumptions:
- * - The background script handles LLM interaction and tab grouping logic.
- * - A `groupTabs` button, `status` text area, and `spinner` element exist in the popup HTML.
- * - The extension has the "tabs" and "tabGroups" permissions.
+ * Features:
+ * - Two grouping modes with different strategies
+ * - Bulk group deletion functionality
+ * - Enhanced UI with better visual feedback
+ * - Improved error handling and status messages
  *
- * Author: Ajinkya Walunj
- * Date: 2025-05-21
+ * Author: Ajinkya Walunj (Enhanced)
+ * Date: 2025-05-28
  */
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
-  const groupTabsButton = document.getElementById('groupTabs');
+  const aggressiveGroupBtn = document.getElementById('aggressiveGroup');
+  const passiveGroupBtn = document.getElementById('passiveGroup');
+  const deleteAllGroupsBtn = document.getElementById('deleteAllGroups');
   const statusElement = document.getElementById('status');
   const spinner = document.getElementById('spinner');
 
+  // Check if API key is set
   chrome.storage.local.get('mistralApiKey', (data) => {
     const apiKey = data.mistralApiKey;
 
     if (!apiKey) {
-      // If key is not set, we show message and hide group button
-      groupTabsButton.style.display = 'none';
-      statusElement.innerHTML = `
+      // If key is not set, hide grouping buttons and show setup message
+      document.getElementById('mainUI').style.display = 'none';
+      document.body.innerHTML += `
         <div style="
           background-color: #fff8e1;
           border: 1px solid #ffecb3;
@@ -47,37 +50,52 @@ document.addEventListener('DOMContentLoaded', () => {
           padding: 16px;
           border-radius: 8px;
           font-family: 'Segoe UI', sans-serif;
-          max-width: 400px;
+          max-width: 240px;
           margin: 20px auto;
           text-align: center;
+          font-size: 14px;
         ">
-          <p style="font-size: 16px; margin: 0 0 10px;">
-            Please set your API key first
-          </p>
-          <a href="options.html" target="_blank" style="
-            color: #d17b00;
-            font-weight: 500;
-            text-decoration: underline;
-          ">
+          <p style="margin-bottom: 10px;">Please set your API key first</p>
+          <a href="options.html" target="_blank" style="color: #d17b00; text-decoration: underline;">
             Click here to set your Mistral API key
           </a>
         </div>
       `;
+
       return;
     }
-    
 
-  groupTabsButton.addEventListener('click', async () => {
+    // Set up event listeners for grouping buttons if API key exists
+    setupGroupingListeners();
+  });
+
+  // Always enable delete groups functionality
+  deleteAllGroupsBtn.addEventListener('click', handleDeleteAllGroups);
+
+  function setupGroupingListeners() {
+    aggressiveGroupBtn.addEventListener('click', () => handleGroupTabs('aggressive'));
+    passiveGroupBtn.addEventListener('click', () => handleGroupTabs('passive'));
+  }
+
+  async function handleGroupTabs(mode) {
     try {
-      groupTabsButton.disabled = true;
-      spinner.style.display = 'block';
+      setLoadingState(true);
       statusElement.textContent = 'Analyzing tabs...';
+      statusElement.className = '';
 
       const tabs = await chrome.tabs.query({ currentWindow: true });
-
       const existingGroups = await chrome.tabGroups.query({ windowId: tabs[0].windowId });
-
       const existingGroupNames = existingGroups.map(group => group.title);
+
+      // Filter only ungrouped tabs
+      const ungroupedTabs = tabs.filter(tab => tab.groupId === -1);
+      
+      if (ungroupedTabs.length === 0) {
+        statusElement.textContent = 'No ungrouped tabs to organize!';
+        statusElement.className = 'status-error';
+        setLoadingState(false);
+        return;
+      }
 
       // Helper to check if URL is safe to inject script into
       const isInjectableUrl = (url) => {
@@ -127,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
       };
-      const ungroupedTabs = tabs.filter(tab => tab.groupId === -1);
-      // Only try to get meta tags from tabs with injectable URLs
+
+      // Extract tab information with metadata
       const tabsInfo = await Promise.all(ungroupedTabs.map(async (tab) => {
         if (!isInjectableUrl(tab.url)) {
           return {
@@ -149,35 +167,89 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       }));
 
-      statusElement.textContent = 'Hang tight! Grouping tabs...';
+      const modeText = mode === 'aggressive' ? 'aggressively grouping' : 'selectively grouping';
+      statusElement.textContent = `Hang tight! AI is ${modeText} your tabs...`;
 
       chrome.runtime.sendMessage({
         action: 'groupTabs',
         tabs: tabsInfo,
-        existingGroups: existingGroupNames
+        existingGroups: existingGroupNames,
+        groupingMode: mode
       }, (response) => {
-
         if (response && response.success) {
-          statusElement.textContent = 'Tabs grouped successfully!';
+          const successText = mode === 'aggressive' 
+            ? 'All tabs grouped successfully!' 
+            : 'Related tabs grouped successfully!';
+          statusElement.textContent = successText;
+          statusElement.className = 'status-success';
         } else {
           console.error('[Popup] Error from background:', response?.error);
-          statusElement.textContent = response?.error || 'Error grouping tabs';
+          statusElement.textContent = `${response?.error || 'Error grouping tabs'}`;
+          statusElement.className = 'status-error';
         }
 
-        groupTabsButton.disabled = false;
-        spinner.style.display = 'none';
-
-        setTimeout(() => {
-          statusElement.textContent = '';
-        }, 3000);
+        setLoadingState(false);
+        clearStatusAfterDelay();
       });
 
     } catch (error) {
       console.error('[Popup] Error in popup script:', error);
-      statusElement.textContent = 'Error: ' + error.message;
-      groupTabsButton.disabled = false;
+      statusElement.textContent = `Error: ${error.message}`;
+      statusElement.className = 'status-error';
+      setLoadingState(false);
+      clearStatusAfterDelay();
+    }
+  }
+
+  async function handleDeleteAllGroups() {
+    try {
+      setLoadingState(true, false); // Don't disable delete button for this action
+      statusElement.textContent = 'Removing all tab groups...';
+      statusElement.className = '';
+
+      chrome.runtime.sendMessage({
+        action: 'deleteAllGroups'
+      }, (response) => {
+        if (response && response.success) {
+          statusElement.textContent = 'All groups deleted successfully!';
+          statusElement.className = 'status-success';
+        } else {
+          console.error('[Popup] Error deleting groups:', response?.error);
+          statusElement.textContent = `${response?.error || 'Error deleting groups'}`;
+          statusElement.className = 'status-error';
+        }
+
+        setLoadingState(false);
+        clearStatusAfterDelay();
+      });
+
+    } catch (error) {
+      console.error('[Popup] Error deleting groups:', error);
+      statusElement.textContent = `Error: ${error.message}`;
+      statusElement.className = 'status-error';
+      setLoadingState(false);
+      clearStatusAfterDelay();
+    }
+  }
+
+  function setLoadingState(loading, disableDelete = true) {
+    aggressiveGroupBtn.disabled = loading;
+    passiveGroupBtn.disabled = loading;
+    if (disableDelete) {
+      deleteAllGroupsBtn.disabled = loading;
+    }
+    
+    if (loading) {
+      spinner.style.display = 'block';
+    } else {
       spinner.style.display = 'none';
     }
-  });
-});
+  }
+
+  function clearStatusAfterDelay() {
+    setTimeout(() => {
+      statusElement.textContent = '';
+      statusElement.className = '';
+    }, 4000);
+  }
 });
