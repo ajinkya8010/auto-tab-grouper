@@ -29,6 +29,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  
   const aggressiveGroupBtn = document.getElementById('aggressiveGroup');
   const passiveGroupBtn = document.getElementById('passiveGroup');
   const deleteAllGroupsBtn = document.getElementById('deleteAllGroups');
@@ -252,4 +253,5 @@ document.addEventListener('DOMContentLoaded', () => {
       statusElement.className = '';
     }, 4000);
   }
+
 });

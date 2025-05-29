@@ -1,5 +1,6 @@
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
+
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'groupTabs') {
@@ -21,6 +22,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+chrome.tabs.onCreated.addListener(async (tab) => {
+  // Check if the tab has a groupId and it's not -1 (ungrouped)
+  if (tab.groupId && tab.groupId !== -1) {
+    try {
+      await chrome.tabs.ungroup(tab.id);
+      console.log(`Ungrouped new tab ${tab.id} that inherited a group.`);
+    } catch (err) {
+      console.warn('Failed to ungroup tab:', err);
+    }
+  }
+});
+
+
 /**
  * Main function to analyze tabs and group them
  */
@@ -41,6 +55,7 @@ async function groupTabs(tabs, existingGroups, groupingMode = 'passive') {
     throw error;
   }
 }
+
 
 /**
  * Delete all tab groups in the current window
@@ -69,6 +84,7 @@ async function deleteAllGroups() {
     throw error;
   }
 }
+
 
 /**
  * Call the LLM to determine appropriate tab groupings
@@ -260,6 +276,7 @@ Respond ONLY with a JSON array of objects like: [{ "tabId": ..., "groupName": ".
   }
 }
 
+
 /**
  * Create new tab groups and collect references to existing ones
  */
@@ -310,6 +327,7 @@ async function setupTabGroups(groupAssignments) {
   
   return groupMap;
 }
+
 
 /**
  * Assign each tab to its corresponding group
