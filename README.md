@@ -16,6 +16,7 @@ Tab Grouper:
 - ✅ Automatically uses and reuses tab groups inside your browser  
 - ✅ Requires no backend — just plug in your API key and go  
 - ✅ Works locally and respects your privacy
+- ✅ Has two modes, aggressive grouping and passive grouping
 
 ---
 
@@ -65,10 +66,13 @@ cd auto-tab-grouper
 
 ## 💡 How to Use
 
-1. Open multiple tabs (news, AI tools, blogs, GitHub, etc.)
-2. Click the “Tab Grouper” extension icon.
-3. Press the “Group Tabs” button.
-4. ✅ Done! Tabs are organized into Chrome groups (with colors and titles).
+1. Open multiple tabs (e.g., blogs, AI tools, docs, news, etc.)
+2. Click the extension icon
+3. Choose a mode:
+4. Aggressive Grouping – Every tab is grouped, even solo ones
+5. Passive Grouping – Only tabs with clear companions are grouped
+6. Optionally, delete all groups using the 🗑️ button
+7. Your tabs are grouped smartly in real time
 
 ---
 
